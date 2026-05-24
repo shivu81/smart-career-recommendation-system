@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Compass — Career Engine | Responsive Career Chatbot</title>
+    <!-- Font Awesome 6 (Free Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sidebar-bg: #1a1d24;
+            --sidebar-text: #b0b5c0;
+            --sidebar-heading: #6b7280;
+            --sidebar-accent: #5b6af0;
+            --main-bg: #fafbfc;
+            --card-bg: #ffffff;
+            --text-primary: #1a1d28;
+            --text-secondary: #5a5f6e;
+            --text-muted: #8b8f9a;
+            --accent: #5b6af0;
+            --accent-dark: #4a56d4;
+            --border: #e8eaef;
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow: 0 8px 24px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.02);
+            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --transition: 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: #eef2f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* main app container */
+        .app-container {
+            display: flex;
+            width: 100%;
+            max-width: 1280px;
+            height: 90vh;
+            max-height: 850px;
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        /* ========= SIDEBAR (desktop & mobile collapsible) ========= */
+        .sidebar {
+            width: 280px;
+            min-width: 280px;
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 18px;
+            color: #fff;
+            transition: transform var(--transition), opacity 0.2s;
+            z-index: 20;
+        }
+
+        /* mobile menu backdrop + toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 30;
+            background: var(--accent);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 30px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .mobile-menu-toggle:hover {
+            background: var(--accent-dark);
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 25;
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-brand {
+            margin-bottom: 28px;
+        }
+        .sidebar-brand h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #f1f3f8;
+        }
+        .sidebar-brand .subtitle {
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #7c82a0;
+        }
+        .new-conversation-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #d8dbe4;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s;
+            margin-bottom: 28px;
+        }
+        .new-conversation-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .sidebar-section-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            color: #5c6278;
+            margin-bottom: 12px;
+        }
+        .history-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            max-height: 55vh;
+        }
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 13px;
+            color: #9ca1b2;
+            transition: all 0.15s;
+            word-break: break-word;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .history-item i {
+            width: 18px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .history-item:hover {
+            background: #242833;
+            color: #e0e4f0;
+        }
+        .history-item.active {
+            background: #2a2e38;
+            color: white;
+            font-weight: 500;
+        }
+        .powered-by {
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 11px;
+            color: #545a6e;
+            text-align: center;
+        }
+
+        /* MAIN CHAT AREA */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--main-bg);
+            position: relative;
+        }
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+        }
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            background: #eef0ff;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        .welcome-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .message-row {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+            align-items: flex-start;
+            animation: fadeSlideUp 0.25s ease;
+        }
+        .message-row.assistant {
+            align-self: flex-start;
+        }
+        .message-row.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #5b6af0, #7c5ce7);
+            color: white;
+        }
+        .message-row.user .avatar {
+            background: #2d3748;
+        }
+        .bubble {
+            padding: 12px 18px;
+            border-radius: var(--radius-lg);
+            font-size: 14.5px;
+            line-height: 1.55;
+            color: #1f2937;
+            background: white;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        .message-row.user .bubble {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .career-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .career-tag {
+            background: #f0f4fe;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #2c3e66;
+        }
+        /* Input dynamic area */
+        .input-area {
+            padding: 16px 32px 24px;
+            background: var(--main-bg);
+            border-top: 1px solid var(--border);
+        }
+        .input-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 6px 8px 6px 18px;
+            border: 1px solid var(--border);
+            transition: box-shadow 0.2s;
+        }
+        .input-container:focus-within {
+            box-shadow: 0 0 0 3px rgba(91, 106, 240, 0.2);
+            border-color: var(--accent);
+        }
+        #dynamicInput {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14.5px;
+            padding: 12px 0;
+            background: transparent;
+            font-family: var(--font-sans);
+        }
+        .choice-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .choice-btn {
+            background: #f1f3f7;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1f2a44;
+        }
+        .choice-btn:hover {
+            background: #e2e8f2;
+            transform: scale(0.97);
+        }
+        .send-action {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+            pointer-events: none;
+            transition: 0.1s;
+        }
+        .send-action.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .skip-helper {
+            background: transparent;
+            border: none;
+            color: #8b8f9a;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* responsive layout */
+        @media (max-width: 780px) {
+            body { padding: 0; }
+            .app-container { height: 100vh; max-height: 100%; border-radius: 0; border: none; }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                z-index: 30;
+                border-radius: 0;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .chat-area {
+                padding: 20px 16px 16px;
+            }
+            .message-row {
+                max-width: 95%;
+            }
+            .input-area {
+                padding: 12px 16px 20px;
+            }
+            .welcome-header h2 {
+                font-size: 22px;
+            }
+        }
+
+        /* scroll */
+        .chat-area::-webkit-scrollbar {
+            width: 5px;
+        }
+        .history-list::-webkit-scrollbar {
+            width: 3px;
+        }
+    </style>
+</head>
+<body>
+<button class="mobile-menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="app-container">
+    <!-- Sidebar component -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h1># Compass</h1>
+            <div class="subtitle">Career Engine</div>
+        </div>
+        <div class="new-conversation-btn" id="newChatBtn">
+            <i class="fas fa-plus-circle"></i> New conversation
+        </div>
+        <div class="sidebar-section-label"><i class="far fa-clock"></i> History</div>
+        <div class="history-list" id="historyList"></div>
+        <div class="powered-by">Created by Prachi · AI Career Match</div>
+    </aside>
+
+    <!-- Main chat -->
+    <main class="main-content">
+        <div class="chat-area" id="chatMessagesContainer">
+            <div class="welcome-header">
+                <div class="badge">✨ Smart Career Fit</div>
+                <h2>Career Compass</h2>
+                <div class="powered">CREATED BY PRACHI</div>
+            </div>
+            <div class="message-row assistant">
+                <div class="avatar">C</div>
+                <div class="bubble">
+                    Welcome — I'm <strong>Compass</strong>, your career guide. I'll ask a handful of questions about what excites you, what you're good at, and how you work. Then I'll surface the careers that fit you best.
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-container" id="inputContainer">
+                <input type="text" id="dynamicInput" placeholder="Type your answer..." autocomplete="off">
+                <button class="skip-helper" id="skipActionBtn" style="display: none;">Skip <i class="fas fa-arrow-right"></i></button>
+                <button class="send-action" id="sendMessageBtn">↑</button>
+            </div>
+            <div id="choicePanel" class="choice-buttons"></div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // ---------- CAREER ASSESSMENT LOGIC (5 Steps) ----------
+    const STEPS = [
+        { id: "name", type: "text", question: "☑️ First — what should I call you? (You can leave this blank.)", placeholder: "Your name..." },
+        { id: "passion", type: "choice", question: "✨ Which of these best describes your passion?", options: ["Creative & Artistic", "Analytical & Data-driven", "Social & Helping", "Technical & Building"] },
+        { id: "skill", type: "choice", question: "⚡ What's your strongest skill?", options: ["Problem-solving", "Communication & Empathy", "Leadership & Strategy", "Hands-on Craftsmanship"] },
+        { id: "workstyle", type: "choice", question: "🏢 What work style suits you best?", options: ["Independent & Remote", "Collaborative & Team-based", "Hybrid / Flexible"] },
+        { id: "values", type: "choice", question: "🌟 What matters most in your career?", options: ["Work-life balance", "High earning potential", "Impact & Purpose", "Job stability & growth"] }
+    ];
+
+    // Career mapping based on answers
+    function computeCareerRecommendations(answers) {
+        const passion = answers.passion || "";
+        const skill = answers.skill || "";
+        const style = answers.workstyle || "";
+        const values = answers.values || "";
+        let careers = [];
+        if (passion.includes("Creative")) careers.push("UX/UI Designer", "Content Strategist", "Brand Director");
+        if (passion.includes("Analytical")) careers.push("Data Analyst", "Financial Advisor", "Business Intelligence");
+        if (passion.includes("Social")) careers.push("Counselor", "HR Specialist", "Community Manager");
+        if (passion.includes("Technical")) careers.push("Software Engineer", "DevOps Architect", "Robotics Specialist");
+        if (skill.includes("Problem-solving")) careers = careers.length ? careers : [...careers, "Product Manager", "Systems Analyst"];
+        if (skill.includes("Communication")) careers.push("Marketing Lead", "Public Relations");
+        if (skill.includes("Leadership")) careers.push("Project Director", "Entrepreneur");
+        if (skill.includes("Hands-on")) careers.push("Architect", "Artisan", "Field Technician");
+        if (values.includes("balance")) careers.push("Remote Work Specialist", "Freelance Consultant");
+        if (values.includes("earning")) careers.push("Investment Banker", "Sales Director");
+        if (values.includes("Impact")) careers.push("Non-profit Manager", "Sustainability Expert");
+        if (values.includes("stability")) careers.push("Civil Servant", "Corporate Analyst");
+        const unique = [...new Set(careers.slice(0, 5))];
+        return unique.length ? unique : ["Career Coach", "Entrepreneur", "Creative Director"];
+    }
+
+    // ---------- APP STATE ----------
+    let sessions = [];      // { id, title, messages, answers, stepIndex, finished, careers }
+    let currentSessionId = null;
+    let currentStep = 0;    // 0..4 (step index)
+    let awaitingAnswer = true;
+
+    // Helper: save to localStorage
+    function persistSessions() {
+        localStorage.setItem("compass_sessions", JSON.stringify(sessions));
+    }
+
+    function loadSessions() {
+        const saved = localStorage.getItem("compass_sessions");
+        if (saved) {
+            sessions = JSON.parse(saved);
+        } else {
+            // init default conversation
+            const defaultId = Date.now().toString();
+            sessions = [{
+                id: defaultId,
+                title: "New conversation",
+                messages: [
+                    { role: "assistant", content: "Welcome — I'm **Compass**, your career guide. I'll ask a handful of questions about what excites you, what you're good at, and how you work. Then I'll surface the careers that fit you best." },
+                    { role: "assistant", content: STEPS[0].question }
+                ],
+                answers: { name: "" },
+                stepIndex: 0,
+                finished: false,
+                careers: []
+            }];
+            currentSessionId = defaultId;
+            persistSessions();
+        }
+        if (!sessions.length) {
+            const fallbackId = Date.now().toString();
+            sessions = [{
+                id: fallbackId, title: "New conversation", messages: [], answers: {}, stepIndex: 0, finished: false, careers: []
+            }];
+        }
+        if (!currentSessionId) currentSessionId = sessions[0].id;
+        renderSidebarHistory();
+    }
+
+    function getCurrentSession() {
+        return sessions.find(s => s.id === currentSessionId) || sessions[0];
+    }
+
+    function updateCurrentSession(updates) {
+        const idx = sessions.findIndex(s => s.id === currentSessionId);
+        if (idx !== -1) {
+            sessions[idx] = { ...sessions[idx], ...updates };
+            persistSessions();
+            renderSidebarHistory();
+        }
+    }
+
+    function renderSidebarHistory() {
+        const historyContainer = document.getElementById('historyList');
+        if (!historyContainer) return;
+        historyContainer.innerHTML = '';
+        sessions.forEach(session => {
+            const div = document.createElement('div');
+            div.className = `history-item ${session.id === currentSessionId ? 'active' : ''}`;
+            div.innerHTML = `<i class="far ${session.id === currentSessionId ? 'fa-check-circle' : 'fa-circle'}"></i> <span>${session.title.length > 28 ? session.title.slice(0,25)+'...' : session.title}</span>`;
+            div.addEventListener('click', (e) => {
+                e.stopPropagation();
+                switchToSession(session.id);
+            });
+            historyContainer.appendChild(div);
+        });
+    }
+
+    function switchToSession(sessionId) {
+        currentSessionId = sessionId;
+        renderSidebarHistory();
+        renderChatMessages();
+        adjustInputByCurrentStep();
+        // close sidebar on mobile after click
+        if (window.innerWidth <= 780) {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+    }
+
+    function renderChatMessages() {
+        const container = document.getElementById('chatMessagesContainer');
+        if (!container) return;
+        const session = getCurrentSession();
+        // preserve welcome header? We'll keep header element but separate dynamic messages
+        let welcomeDiv = container.querySelector('.welcome-header');
+        if (!welcomeDiv) {
+            container.innerHTML = `<div class="welcome-header"><div class="badge">✨ Smart Career Fit</div><h2>Career Compass</h2><div class="powered">CREATED BY PRACHI</div></div>`;
+            welcomeDiv = container.querySelector('.welcome-header');
+        }
+        // remove all messages after header
+        const children = Array.from(container.children);
+        for (let i = 1; i < children.length; i++) {
+            if (!children[i].classList?.contains('welcome-header')) children[i].remove();
+        }
+        // render session messages
+        session.messages.forEach(msg => {
+            const row = document.createElement('div');
+            row.className = `message-row ${msg.role}`;
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'avatar';
+            avatarDiv.innerText = msg.role === 'assistant' ? 'C' : 'U';
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'bubble';
+            bubbleDiv.innerHTML = msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            row.appendChild(avatarDiv);
+            row.appendChild(bubbleDiv);
+            container.appendChild(row);
+        });
+        // if finished and careers, also show career recommendations
+        if (session.finished && session.careers.length) {
+            const row = document.createElement('div');
+            row.className = 'message-row assistant';
+            const avatarDiv = document.createElement('div'); avatarDiv.className = 'avatar'; avatarDiv.innerText = 'C';
+            const bubble = document.createElement('div'); bubble.className = 'bubble';
+            let careersHtml = `<strong>🎯 Your best-fit careers:</strong><div class="career-cards">${session.careers.map(c => `<span class="career-tag">${c}</span>`).join('')}</div><div style="margin-top:12px"><em>✨ Start a new conversation to explore other paths.</em></div>`;
+            bubble.innerHTML = careersHtml;
+            row.appendChild(avatarDiv); row.appendChild(bubble);
+            container.appendChild(row);
+        }
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function adjustInputByCurrentStep() {
+        const session = getCurrentSession();
+        if (session.finished) {
+            document.getElementById('dynamicInput').disabled = true;
+            document.getElementById('sendMessageBtn').classList.remove('active');
+            document.getElementById('choicePanel').innerHTML = '<span style="font-size:13px; color:#8b8f9a;">✅ Assessment complete — start a new conversation</span>';
+            document.getElementById('skipActionBtn').style.display = 'none';
+            return;
+        }
+        const stepIdx = session.stepIndex;
+        if (stepIdx >= STEPS.length) {
+            // finalize
+            finalizeAssessment(session);
+            return;
+        }
+        const step = STEPS[stepIdx];
+        const inputField = document.getElementById('dynamicInput');
+        inputField.disabled = false;
+        inputField.value = '';
+        const choicePanel = document.getElementById('choicePanel');
+        const skipBtn = document.getElementById('skipActionBtn');
+        if (step.type === 'text') {
+            choicePanel.innerHTML = '';
+            inputField.style.display = 'block';
+            inputField.placeholder = step.placeholder || "Your answer...";
+            skipBtn.style.display = 'inline-flex';
+            skipBtn.onclick = () => {
+                // skip name step: just record empty name
+                if (step.id === 'name') {
+                    recordAnswer("", session);
+                }
+            };
+        } else {
+            skipBtn.style.display = 'none';
+            inputField.style.display = 'none';
+            choicePanel.innerHTML = '';
+            step.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = opt;
+                btn.addEventListener('click', () => recordAnswer(opt, session));
+                choicePanel.appendChild(btn);
+            });
+        }
+        // update send button visibility for text only
+        const sendBtn = document.getElementById('sendMessageBtn');
+        if (step.type === 'text') {
+            inputField.style.display = 'block';
+            sendBtn.style.display = 'inline-flex';
+            sendBtn.classList.remove('active');
+            inputField.addEventListener('input', () => {
+                if (inputField.value.trim().length > 0) sendBtn.classList.add('active');
+                else sendBtn.classList.remove('active');
+            });
+            sendBtn.onclick = () => {
+                if (sendBtn.classList.contains('active')) {
+                    recordAnswer(inputField.value.trim(), session);
+                }
+            };
+        } else {
+            sendBtn.style.display = 'none';
+        }
+    }
+
+    function recordAnswer(answer, session) {
+        const stepIdx = session.stepIndex;
+        if (stepIdx >= STEPS.length) return;
+        const step = STEPS[stepIdx];
+        // update answers
+        const newAnswers = { ...session.answers };
+        newAnswers[step.id] = answer || (step.id === 'name' ? (answer || "Friend") : "");
+        if (step.id === 'name' && (!answer || answer === "")) newAnswers.name = "Explorer";
+        const userName = newAnswers.name;
+        // push user message
+        const userMsgText = answer ? answer : (step.id === 'name' ? "(skipped)" : "answered");
+        const updatedMessages = [...session.messages, { role: "user", content: userMsgText }];
+        const nextStepIdx = stepIdx + 1;
+        let finishedFlag = false;
+        let finalCareers = [];
+        let assistantMsg = "";
+
+        if (nextStepIdx >= STEPS.length) {
+            finishedFlag = true;
+            finalCareers = computeCareerRecommendations(newAnswers);
+            assistantMsg = `Thanks ${userName || "friend"}! Based on your profile, here are roles that match you best.`;
+            updatedMessages.push({ role: "assistant", content: assistantMsg });
+        } else {
+            const nextQ = STEPS[nextStepIdx].question;
+            const stepNumber = nextStepIdx+1;
+            assistantMsg = `<div class="step-badge"><span>✓</span> Step ${stepNumber} of 5</div> ${nextQ}`;
+            updatedMessages.push({ role: "assistant", content: assistantMsg });
+        }
+
+        const updatedSession = {
+            ...session,
+            answers: newAnswers,
+            messages: updatedMessages,
+            stepIndex: nextStepIdx,
+            finished: finishedFlag,
+            careers: finalCareers,
+            title: `${newAnswers.name ? newAnswers.name : "Conversation"} · Career`
+        };
+        const idx = sessions.findIndex(s => s.id === session.id);
+        if (idx !== -1) sessions[idx] = updatedSession;
+        persistSessions();
+        if (currentSessionId === session.id) {
+            renderChatMessages();
+            if (!finishedFlag) adjustInputByCurrentStep();
+            else {
+                document.getElementById('choicePanel').innerHTML = '<span style="font-size:13px;">🎉 Careers ready! Start new chat for another assessment.</span>';
+                document.getElementById('dynamicInput').disabled = true;
+                document.getElementById('sendMessageBtn').style.display = 'none';
+                document.getElementById('skipActionBtn').style.display = 'none';
+                renderChatMessages();
+            }
+        }
+    }
+
+    function finalizeAssessment(session) {
+        if (!session.finished) {
+            const careers = computeCareerRecommendations(session.answers);
+            session.finished = true;
+            session.careers = careers;
+            session.messages.push({ role: "assistant", content: `✨ Here are your personalized career paths:` });
+            persistSessions();
+            renderChatMessages();
+            adjustInputByCurrentStep();
+        }
+    }
+
+    function createNewConversation() {
+        const newId = Date.now().toString() + Math.random();
+        const newSession = {
+            id: newId,
+            title: "New conversation",
+            messages: [
+                { role: "assistant", content: "Welcome — I'm **Compass**, your career guide. I'll ask a handful of questions about what excites you, what you're good at, and how you work. Then I'll surface the careers that fit you best." },
+                { role: "assistant", content: STEPS[0].question }
+            ],
+            answers: {},
+            stepIndex: 0,
+            finished: false,
+            careers: []
+        };
+        sessions.unshift(newSession);
+        currentSessionId = newId;
+        persistSessions();
+        renderSidebarHistory();
+        renderChatMessages();
+        adjustInputByCurrentStep();
+        // close mobile sidebar if open
+        if (window.innerWidth <= 780) {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+    }
+
+    // Mobile sidebar toggles
+    function initMobileMenu() {
+        const toggle = document.getElementById('menuToggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const closeSidebar = () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        };
+        const openSidebar = () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        };
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (sidebar.classList.contains('open')) closeSidebar();
+            else openSidebar();
+        });
+        overlay.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 780) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadSessions();
+        initMobileMenu();
+        renderChatMessages();
+        const session = getCurrentSession();
+        if (session.stepIndex === undefined) session.stepIndex = 0;
+        adjustInputByCurrentStep();
+
+        document.getElementById('newChatBtn').addEventListener('click', () => {
+            createNewConversation();
+        });
+        // additional enter key
+        const inp = document.getElementById('dynamicInput');
+        if (inp) {
+            inp.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && document.getElementById('sendMessageBtn').classList.contains('active')) {
+                    document.getElementById('sendMessageBtn').click();
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
